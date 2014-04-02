@@ -20,9 +20,6 @@ import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.data.mapping.context.AbstractMappingContext;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.repository.Repository;
@@ -35,16 +32,12 @@ import org.springframework.data.util.TypeInformation;
  * 
  */
 public class SimpleRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
-		extends RepositoryFactoryBeanSupport<T, S, ID> implements BeanFactoryAware {
+		extends RepositoryFactoryBeanSupport<T, S, ID> {
 
-	private BeanFactory beanFactory;
+	private Repository<?, ?> target;
 
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
-	}
-
-	public SimpleRepositoryFactoryBean() {
+	public SimpleRepositoryFactoryBean(Repository<?, ?> target) {
+		this.target = target;
 		setMappingContext(new AbstractMappingContext<SimplePersistentEntity<?>, SimplePersistentProperty>() {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			@Override
@@ -61,14 +54,11 @@ public class SimpleRepositoryFactoryBean<T extends Repository<S, ID>, S, ID exte
 						simpleTypeHolder);
 			}
 		});
-
 	}
 
 	@Override
 	protected RepositoryFactorySupport createRepositoryFactory() {
-		Repository<?, ?> repository = (Repository<?, ?>) beanFactory
-				.getBean(getObjectType());
-		return new SimpleRepositoryFactory(repository);
+		return new SimpleRepositoryFactory(target);
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,10 @@ public class ApplicationTests {
 	private DataSource dataSource;
 
 	@Test
+	@Ignore("Just used to generate QBook")
 	public void generateQueryClasses() throws SQLException {
 		GenericExporter exporter = new GenericExporter();
-		exporter.setTargetFolder(new File("src/main/java"));
+		exporter.setTargetFolder(new File("src/test/java"));
 		exporter.export(Book.class.getPackage());
 	}
 

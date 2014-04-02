@@ -16,25 +16,47 @@
 
 package org.springframework.data.simple;
 
-import java.lang.annotation.Annotation;
+import java.io.Serializable;
 
-import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
-import org.springframework.data.repository.config.RepositoryConfigurationExtension;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.repository.Repository;
 
 /**
  * @author Dave Syer
  *
  */
-public class SimpleRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
-
+@Configuration
+public class SimpleRepositoriesRegistrar<S> implements BeanPostProcessor {
+	
 	@Override
-	protected Class<? extends Annotation> getAnnotation() {
-		return EnableSimpleRepositories.class;
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
+		if (bean instanceof Repository) {
+			SimpleRepositoryFactoryBean<Repository<S, Serializable>, S, Serializable> factory = new SimpleRepositoryFactoryBean<Repository<S,Serializable>, S, Serializable>((Repository<?, ?>) bean);
+			factory.setRepositoryInterface(findRepositoryInterface(bean));
+			return factory;
+		}
+		return bean;
 	}
 
 	@Override
-	protected RepositoryConfigurationExtension getExtension() {
-		return new SimpleRepositoryConfigExtension();
+	public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
+		return bean;
+	}
+
+	private Class<? extends Repository<S, Serializable>> findRepositoryInterface(
+			Object bean) {
+		for (Class<?> type : bean.getClass().getInterfaces()) {
+			if (Repository.class.isAssignableFrom(type)) {
+				@SuppressWarnings("unchecked")
+				Class<? extends Repository<S, Serializable>> result = (Class<? extends Repository<S, Serializable>>) type;
+				return result;
+			}
+		}
+		throw new IllegalStateException("Could not find Repository interface for " + bean.getClass()); 
 	}
 
 }

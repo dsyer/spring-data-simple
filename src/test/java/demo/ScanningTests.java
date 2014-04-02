@@ -15,10 +15,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.Repository;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.data.simple.EnableSimpleRepositories;
-import org.springframework.data.simple.SimpleRepositoryFactoryBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +24,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 
 import demo.ScanningTests.ScanningApplication;
-import demo.domain.Book;
 import demo.domain.BookRepository;
 import demo.domain.SimpleBookRepository;
 
@@ -78,13 +75,6 @@ public class ScanningTests {
 			return new SimpleBookRepository(dataSource);
 		}
 		
-		@Bean
-		public SimpleRepositoryFactoryBean<Repository<Book, Long>, Book, Long> repositoryFactory() {
-			SimpleRepositoryFactoryBean<Repository<Book, Long>, Book, Long> factory = new SimpleRepositoryFactoryBean<Repository<Book,Long>, Book, Long>();
-			factory.setRepositoryInterface(BookRepository.class);
-			return factory;
-		}
-
 	}
 
 }

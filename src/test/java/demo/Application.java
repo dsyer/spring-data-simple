@@ -8,10 +8,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.core.support.RepositoryFactoryBeanSupport;
-import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
-import org.springframework.data.simple.SimpleRepositoryFactory;
 import org.springframework.data.simple.SimpleRepositoryFactoryBean;
 
 import demo.domain.Book;
@@ -22,28 +19,19 @@ import demo.domain.SimpleBookRepository;
 @EnableAutoConfiguration
 @Import(RepositoryRestMvcConfiguration.class)
 public class Application {
-	
+
 	@Autowired
 	protected DataSource dataSource;
-	
-	@Bean
-	protected BookRepository repository() {
-		return new SimpleBookRepository(dataSource);
-	}
 
 	@Bean
-	public RepositoryFactoryBeanSupport<BookRepository, Book, Long> repositoryFactory() {
-		SimpleRepositoryFactoryBean<BookRepository, Book, Long> factory = new SimpleRepositoryFactoryBean<BookRepository, Book, Long>() {
-			@Override
-			protected RepositoryFactorySupport createRepositoryFactory() {
-				return new SimpleRepositoryFactory(repository());
-			}
-		};
+	public SimpleRepositoryFactoryBean<BookRepository, Book, Long> repositoryFactory() {
+		SimpleRepositoryFactoryBean<BookRepository, Book, Long> factory = new SimpleRepositoryFactoryBean<BookRepository, Book, Long>(
+				new SimpleBookRepository(dataSource));
 		factory.setRepositoryInterface(BookRepository.class);
 		return factory;
 	}
 
-    public static void main(String[] args) throws Exception {
-    	SpringApplication.run(Application.class, args);
-    }
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(Application.class, args);
+	}
 }
