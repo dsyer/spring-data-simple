@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.simple;
+package org.springframework.data.repository.simple.support;
 
 import java.io.Serializable;
 

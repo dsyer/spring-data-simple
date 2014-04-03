@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package org.springframework.data.simple;
+package org.springframework.data.repository.simple.support;
 
-import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
+import org.springframework.data.mapping.model.BasicPersistentEntity;
+import org.springframework.data.mapping.model.MutablePersistentEntity;
+import org.springframework.data.util.TypeInformation;
+
 
 /**
  * @author Dave Syer
  *
  */
-public class SimpleRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
+public class SimplePersistentEntity<T> extends BasicPersistentEntity<T, SimplePersistentProperty> implements MutablePersistentEntity<T, SimplePersistentProperty> {
 
-	@Override
-	public String getRepositoryFactoryClassName() {
-		return SimpleRepositoryFactoryInformation.class.getName();
-	}
-
-	@Override
-	protected String getModulePrefix() {
-		return "simple";
+	public SimplePersistentEntity(TypeInformation<T> information) {
+		super(information);
 	}
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.simple;
+package org.springframework.data.repository.simple;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

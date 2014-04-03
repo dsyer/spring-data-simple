@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.simple;
+package org.springframework.data.repository.simple;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;

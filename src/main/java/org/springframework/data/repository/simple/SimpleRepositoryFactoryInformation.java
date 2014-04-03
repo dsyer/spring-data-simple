@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.data.simple;
+package org.springframework.data.repository.simple;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
@@ -31,6 +31,9 @@ import org.springframework.data.repository.core.support.RepositoryFactoryBeanSup
 import org.springframework.data.repository.core.support.RepositoryFactoryInformation;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.query.QueryMethod;
+import org.springframework.data.repository.simple.support.SimplePersistentEntity;
+import org.springframework.data.repository.simple.support.SimplePersistentProperty;
+import org.springframework.data.repository.simple.support.SimpleRepositoryFactory;
 import org.springframework.data.util.TypeInformation;
 
 /**
