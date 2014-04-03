@@ -61,6 +61,10 @@ public class SimpleRepositoryFactoryInformation<S, ID extends Serializable> impl
 	public RepositoryInformation getRepositoryInformation() {
 		return getDelegate().getRepositoryInformation();
 	}
+	
+	public Repository<S, ID> getTarget() {
+		return target;
+	}
 
 	private SimpleRepositoryFactoryDelegate<Repository<S, ID>, S, ID> getDelegate() {
 		if (delegate==null) {

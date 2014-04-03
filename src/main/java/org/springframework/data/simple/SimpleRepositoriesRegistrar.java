@@ -32,6 +32,7 @@ import org.springframework.data.repository.Repository;
 @Configuration
 public class SimpleRepositoriesRegistrar implements BeanDefinitionRegistryPostProcessor {
 
+	public static final String INFORMATION_SUFFIX = ".information";
 	private BeanDefinitionRegistry registry;
 
 	@Override
@@ -42,7 +43,7 @@ public class SimpleRepositoriesRegistrar implements BeanDefinitionRegistryPostPr
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder
 					.genericBeanDefinition(SimpleRepositoryFactoryInformation.class);
 			builder.addConstructorArgReference(name);
-			registry.registerBeanDefinition(name + ".instance", builder.getBeanDefinition());
+			registry.registerBeanDefinition(name + INFORMATION_SUFFIX, builder.getBeanDefinition());
 		}
 	}
 

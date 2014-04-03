@@ -81,11 +81,11 @@ public @interface EnableSimpleRepositories {
 
 	/**
 	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
-	 * {@link Key#CREATE_IF_NOT_FOUND}.
+	 * {@link Key#USE_DECLARED_QUERY}.
 	 * 
 	 * @return
 	 */
-	Key queryLookupStrategy() default Key.CREATE_IF_NOT_FOUND;
+	Key queryLookupStrategy() default Key.USE_DECLARED_QUERY;
 
 	/**
 	 * Configures the location of where to find the Spring Data named queries properties file. Will default to

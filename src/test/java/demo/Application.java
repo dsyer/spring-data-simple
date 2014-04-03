@@ -8,15 +8,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.data.simple.SimpleRepositoryFactoryInformation;
+import org.springframework.data.simple.SimpleRepositoryRestMvcConfiguration;
 
 import demo.domain.Book;
 import demo.domain.SimpleBookRepository;
 
 @Configuration
 @EnableAutoConfiguration
-@Import(RepositoryRestMvcConfiguration.class)
+@Import(SimpleRepositoryRestMvcConfiguration.class)
 public class Application {
 
 	@Autowired
