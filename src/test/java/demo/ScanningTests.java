@@ -64,7 +64,7 @@ public class ScanningTests {
 	}
 	
 	@Configuration
-	@EnableSimpleRepositories
+	@EnableSimpleRepositories(basePackageClasses=ScanningApplication.class)
 	@EnableAutoConfiguration
 	@Import(SimpleRepositoryRestMvcConfiguration.class)
 	protected static class ScanningApplication {

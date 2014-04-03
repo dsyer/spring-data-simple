@@ -18,33 +18,90 @@ package org.springframework.data.repository.simple;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.config.AnnotationRepositoryConfigurationSource;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
  * 
  */
-@Configuration
-public class SimpleRepositoriesRegistrar implements BeanDefinitionRegistryPostProcessor {
+public class SimpleRepositoriesRegistrar implements ImportBeanDefinitionRegistrar,
+		BeanDefinitionRegistryPostProcessor, ResourceLoaderAware, EnvironmentAware {
+
+	private ResourceLoader resourceLoader;
+	private Environment environment;
 
 	public static final String INFORMATION_SUFFIX = ".information";
 	private BeanDefinitionRegistry registry;
+	
+	private AnnotationRepositoryConfigurationSource configurationSource;
+
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
+
+	@Override
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
+	
+	public void setConfigurationSource(
+			AnnotationRepositoryConfigurationSource configurationSource) {
+		this.configurationSource = configurationSource;
+	}
+
+	@Override
+	public void registerBeanDefinitions(AnnotationMetadata annotationMetadata,
+			BeanDefinitionRegistry registry) {
+		AnnotationRepositoryConfigurationSource configurationSource = new AnnotationRepositoryConfigurationSource(
+				annotationMetadata, EnableSimpleRepositories.class, resourceLoader,
+				environment);
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder
+				.rootBeanDefinition(SimpleRepositoriesRegistrar.class);
+		builder.addPropertyValue("configurationSource", configurationSource);
+		registry.registerBeanDefinition(SimpleRepositoriesRegistrar.class.getName(),
+				builder.getBeanDefinition());
+	}
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
 			throws BeansException {
 		for (String name : BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 				beanFactory, Repository.class, false, false)) {
-			BeanDefinitionBuilder builder = BeanDefinitionBuilder
-					.genericBeanDefinition(SimpleRepositoryFactoryInformation.class);
-			builder.addConstructorArgReference(name);
-			registry.registerBeanDefinition(name + INFORMATION_SUFFIX, builder.getBeanDefinition());
+			if (isIncluded(beanFactory.getType(name))) {
+				BeanDefinitionBuilder builder = BeanDefinitionBuilder
+						.genericBeanDefinition(SimpleRepositoryFactoryInformation.class);
+				builder.addConstructorArgReference(name);
+				registry.registerBeanDefinition(name + INFORMATION_SUFFIX,
+						builder.getBeanDefinition());
+			}
 		}
+	}
+
+	private boolean isIncluded(Class<?> type) {
+		for (String pkg : configurationSource.getBasePackages() ) {
+			if (ClassUtils.getPackageName(type).startsWith(pkg)) {
+				for (BeanDefinition definition : configurationSource.getCandidates(resourceLoader)) {
+					if (ClassUtils.resolveClassName(definition.getBeanClassName(), null).isAssignableFrom(type)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
