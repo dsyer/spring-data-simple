@@ -16,47 +16,40 @@
 
 package org.springframework.data.simple;
 
-import java.io.Serializable;
-
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.repository.Repository;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 @Configuration
-public class SimpleRepositoriesRegistrar<S> implements BeanPostProcessor {
-	
+public class SimpleRepositoriesRegistrar implements BeanDefinitionRegistryPostProcessor {
+
+	private BeanDefinitionRegistry registry;
+
 	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
 			throws BeansException {
-		if (bean instanceof Repository) {
-			SimpleRepositoryFactoryBean<Repository<S, Serializable>, S, Serializable> factory = new SimpleRepositoryFactoryBean<Repository<S,Serializable>, S, Serializable>((Repository<?, ?>) bean);
-			factory.setRepositoryInterface(findRepositoryInterface(bean));
-			return factory;
+		for (String name : BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
+				beanFactory, Repository.class, false, false)) {
+			BeanDefinitionBuilder builder = BeanDefinitionBuilder
+					.genericBeanDefinition(SimpleRepositoryFactoryInformation.class);
+			builder.addConstructorArgReference(name);
+			registry.registerBeanDefinition(name + ".instance", builder.getBeanDefinition());
 		}
-		return bean;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName)
+	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
 			throws BeansException {
-		return bean;
-	}
-
-	private Class<? extends Repository<S, Serializable>> findRepositoryInterface(
-			Object bean) {
-		for (Class<?> type : bean.getClass().getInterfaces()) {
-			if (Repository.class.isAssignableFrom(type)) {
-				@SuppressWarnings("unchecked")
-				Class<? extends Repository<S, Serializable>> result = (Class<? extends Repository<S, Serializable>>) type;
-				return result;
-			}
-		}
-		throw new IllegalStateException("Could not find Repository interface for " + bean.getClass()); 
+		this.registry = registry;
 	}
 
 }

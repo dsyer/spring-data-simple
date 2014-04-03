@@ -40,7 +40,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @Configuration
 @ConditionalOnBean(DataSource.class)
 @ConditionalOnClass(Repository.class)
-@ConditionalOnMissingBean(SimpleRepositoryFactoryBean.class)
+@ConditionalOnMissingBean(SimpleRepositoryFactoryInformation.class)
 @Import(SimpleRepositoriesAutoConfigureRegistrar.class)
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class SimpleRepositoriesAutoConfiguration {

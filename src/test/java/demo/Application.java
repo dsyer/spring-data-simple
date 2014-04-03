@@ -9,10 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
-import org.springframework.data.simple.SimpleRepositoryFactoryBean;
+import org.springframework.data.simple.SimpleRepositoryFactoryInformation;
 
 import demo.domain.Book;
-import demo.domain.BookRepository;
 import demo.domain.SimpleBookRepository;
 
 @Configuration
@@ -24,11 +23,15 @@ public class Application {
 	protected DataSource dataSource;
 
 	@Bean
-	public SimpleRepositoryFactoryBean<BookRepository, Book, Long> repositoryFactory() {
-		SimpleRepositoryFactoryBean<BookRepository, Book, Long> factory = new SimpleRepositoryFactoryBean<BookRepository, Book, Long>(
-				new SimpleBookRepository(dataSource));
-		factory.setRepositoryInterface(BookRepository.class);
+	public SimpleRepositoryFactoryInformation<Book, Long> repositoryFactory() {
+		SimpleRepositoryFactoryInformation<Book, Long> factory = new SimpleRepositoryFactoryInformation<Book, Long>(
+				bookRepository());
 		return factory;
+	}
+
+	@Bean
+	public SimpleBookRepository bookRepository() {
+		return new SimpleBookRepository(dataSource);
 	}
 
 	public static void main(String[] args) throws Exception {

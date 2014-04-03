@@ -16,22 +16,18 @@
 
 package org.springframework.data.simple;
 
-import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
+import org.springframework.data.repository.support.Repositories;
+import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
 /**
  * @author Dave Syer
  *
  */
-public class SimpleRepositoryConfigExtension extends RepositoryConfigurationExtensionSupport {
-
+public class SimpleRepositoryRestMvcConfiguration extends RepositoryRestMvcConfiguration {
+	
 	@Override
-	public String getRepositoryFactoryClassName() {
-		return SimpleRepositoryFactoryInformation.class.getName();
-	}
-
-	@Override
-	protected String getModulePrefix() {
-		return "simple";
+	public Repositories repositories() {
+		return null;
 	}
 
 }

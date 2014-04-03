@@ -101,7 +101,7 @@ public @interface EnableSimpleRepositories {
 	 * 
 	 * @return
 	 */
-	Class<?> repositoryFactoryBeanClass() default SimpleRepositoryFactoryBean.class;
+	Class<?> repositoryFactoryBeanClass() default SimpleRepositoryFactoryInformation.class;
 
 	/**
 	 * Configures whether nested repository-interfaces (e.g. defined as inner classes) should be discovered by the
