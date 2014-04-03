@@ -23,8 +23,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 
 /**
  * @author Dave Syer
@@ -34,9 +36,7 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@BaseSimpleRepositories
-@Import(SimpleRepositoriesRegistrar.class)
-public @interface EnableSimpleRepositories {
+@interface BaseSimpleRepositories {
 
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation declarations e.g.:
@@ -67,5 +67,44 @@ public @interface EnableSimpleRepositories {
 	 * Specifies which types are not eligible for component scanning.
 	 */
 	Filter[] excludeFilters() default {};
+
+	/**
+	 * Returns the postfix to be used when looking up custom repository implementations. Defaults to {@literal Impl}. So
+	 * for a repository named {@code PersonRepository} the corresponding implementation class will be looked up scanning
+	 * for {@code PersonRepositoryImpl}.
+	 * 
+	 * @return
+	 */
+	String repositoryImplementationPostfix() default "Impl";
+
+	/**
+	 * Returns the key of the {@link QueryLookupStrategy} to be used for lookup queries for query methods. Defaults to
+	 * {@link Key#USE_DECLARED_QUERY}.
+	 * 
+	 * @return
+	 */
+	Key queryLookupStrategy() default Key.USE_DECLARED_QUERY;
+
+	/**
+	 * Configures the location of where to find the Spring Data named queries properties file. Will default to
+	 * empty (since it doesn't necessarily have an implementation for a simple repository).
+	 * 
+	 * @return
+	 */
+	String namedQueriesLocation() default "";
+
+	/**
+	 * Returns the {@link FactoryBean} class to be used for each repository instance. Defaults to
+	 * {@link JpaRepositoryFactoryBean}.
+	 * 
+	 * @return
+	 */
+	Class<?> repositoryFactoryBeanClass() default SimpleRepositoryFactoryInformation.class;
+
+	/**
+	 * Configures whether nested repository-interfaces (e.g. defined as inner classes) should be discovered by the
+	 * repositories infrastructure.
+	 */
+	boolean considerNestedRepositories() default false;
 	
 }
