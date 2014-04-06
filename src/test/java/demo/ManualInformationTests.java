@@ -1,6 +1,6 @@
 package demo;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,8 +21,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.simple.SimpleRepositoryFactoryInformation;
-import org.springframework.data.repository.simple.SimpleRepositoryRestMvcConfiguration;
+import org.springframework.data.repository.simple.support.SimpleRepositoryFactoryBean;
+import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,8 +36,9 @@ import com.mysema.query.sql.SQLQueryFactory;
 
 import demo.ManualInformationTests.Application;
 import demo.domain.Book;
+import demo.domain.BookRepository;
+import demo.domain.BookRepositoryImpl;
 import demo.domain.QBook;
-import demo.domain.SimpleBookRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -50,8 +51,11 @@ public class ManualInformationTests {
 	@Autowired
 	private DataSource dataSource;
 
+	@Autowired
+	private BookRepository repository;
+
 	private MockMvc mockMvc;
-	
+
 	@Test
 	@Ignore("Just used to generate QBook")
 	public void generateQueryClasses() throws SQLException {
@@ -59,12 +63,18 @@ public class ManualInformationTests {
 		exporter.setTargetFolder(new File("src/test/java"));
 		exporter.export(Book.class.getPackage());
 	}
+	
+	@Test
+	public void findOne() throws Exception {
+		assertNotNull(repository.findOne(0L));
+	}
 
 	@Test
 	public void simpleDslQuery() throws Exception {
 		QBook book = new QBook("books");
 		QBook books = new QBook("books");
-		com.mysema.query.sql.Configuration configuration = new com.mysema.query.sql.Configuration(new H2Templates());
+		com.mysema.query.sql.Configuration configuration = new com.mysema.query.sql.Configuration(
+				new H2Templates());
 		List<Tuple> query = new SQLQueryFactory(configuration, dataSource).from(books)
 				.where(book.title.startsWith("E")).list(books.id, books.title);
 		assertEquals(1, query.size());
@@ -81,35 +91,31 @@ public class ManualInformationTests {
 	}
 
 	@Test
-	public void simpleQuery() throws Exception {
+	public void simpleRequest() throws Exception {
 		mockMvc.perform(get("/books/search")).andExpect(status().isOk());
-		mockMvc.perform(get("/books/search/findByTitleContains?title=E")).andExpect(status().isOk());
+		mockMvc.perform(get("/books/search/findByTitleContains?title=E")).andExpect(
+				status().isOk());
 	}
-
 
 	@Configuration
 	@EnableAutoConfiguration
-	@Import(SimpleRepositoryRestMvcConfiguration.class)
+	@Import(RepositoryRestMvcConfiguration.class)
 	protected static class Application {
-
+		
 		@Autowired
-		protected DataSource dataSource;
+		private DataSource dataSource;
 
 		@Bean
-		public SimpleRepositoryFactoryInformation<Book, Long> repositoryFactory() {
-			SimpleRepositoryFactoryInformation<Book, Long> factory = new SimpleRepositoryFactoryInformation<Book, Long>(
-					bookRepository());
+		public SimpleRepositoryFactoryBean<BookRepository, Book, Long> bookRepository() {
+			SimpleRepositoryFactoryBean<BookRepository, Book, Long> factory = new SimpleRepositoryFactoryBean<BookRepository, Book, Long>();
+			factory.setRepositoryInterface(BookRepository.class);
+			factory.setCustomImplementation(new BookRepositoryImpl(dataSource));
 			return factory;
-		}
-
-		@Bean
-		public SimpleBookRepository bookRepository() {
-			return new SimpleBookRepository(dataSource);
 		}
 
 		public static void main(String[] args) throws Exception {
 			SpringApplication.run(Application.class, args);
 		}
 	}
-	
+
 }

@@ -33,11 +33,7 @@ import org.springframework.data.repository.query.QueryLookupStrategy.Key;
  */
 public class SimpleRepositoryFactory extends RepositoryFactorySupport {
 
-	private Repository<?, ?> repository;
-
-	public SimpleRepositoryFactory(Repository<?, ?> repository) {
-		this.repository = repository;	
-	}
+	private Repository<?, ?> repository = new Repository<Object,Serializable>(){};
 
 	@Override
 	public Object getTargetRepository(RepositoryMetadata metadata) {

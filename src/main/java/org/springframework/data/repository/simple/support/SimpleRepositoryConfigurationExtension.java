@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.data.repository.simple;
+package org.springframework.data.repository.simple.support;
 
-import java.lang.annotation.Annotation;
-
-import org.springframework.data.repository.config.RepositoryBeanDefinitionRegistrarSupport;
-import org.springframework.data.repository.config.RepositoryConfigurationExtension;
-import org.springframework.data.repository.simple.support.SimpleRepositoryConfigurationExtension;
+import org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class SimpleRepositoriesRegistrar extends RepositoryBeanDefinitionRegistrarSupport {
+public class SimpleRepositoryConfigurationExtension extends
+		RepositoryConfigurationExtensionSupport {
 
 	@Override
-	protected Class<? extends Annotation> getAnnotation() {
-		return EnableSimpleRepositories.class;
+	public String getRepositoryFactoryClassName() {
+		return SimpleRepositoryFactoryBean.class.getName();
 	}
 
 	@Override
-	protected RepositoryConfigurationExtension getExtension() {
-		return new SimpleRepositoryConfigurationExtension();
+	protected String getModulePrefix() {
+		return "simple";
 	}
-
-
 
 }

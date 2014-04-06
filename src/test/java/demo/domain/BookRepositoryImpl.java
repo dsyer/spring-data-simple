@@ -33,12 +33,12 @@ import org.springframework.stereotype.Repository;
  *
  */
 @Repository
-public class SimpleBookRepository implements BookRepository {
+public class BookRepositoryImpl implements BookRepository {
 
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	public SimpleBookRepository(DataSource dataSource) {
+	public BookRepositoryImpl(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
@@ -87,7 +87,7 @@ public class SimpleBookRepository implements BookRepository {
 
 	@Override
 	public Book findOne(Long id) {
-		return jdbcTemplate.queryForObject("SELECT id, title, from BOOKS where id=?", new BookMapper());
+		return jdbcTemplate.queryForObject("SELECT id, title from BOOKS where id=?", new BookMapper(), id);
 	}
 
 	@Override
